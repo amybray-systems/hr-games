@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Games Collection | Amy Bray</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .game-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .game-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .status-live {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-coming {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .game-features {
+            list-style: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .game-features li {
+            color: #666;
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .game-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .footer a:hover {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 HR Games Collection</h1>
+            <p class="subtitle">Fun, educational games for HR professionals and tech enthusiasts</p>
+        </div>
+
+        <div class="games-grid">
+            <!-- Acronym Attack -->
+            <a href="./acronym-attack/index.html" class="game-card">
+                <div class="game-icon">🎯</div>
+                <h2 class="game-title">Acronym Attack</h2>
+                <p class="game-description">
+                    Test your knowledge of HR, Salesforce, Azure, and AI acronyms in this fast-paced quiz game!
+                </p>
+                <ul class="game-features">
+                    <li>5 different topics to choose from</li>
+                    <li>67+ acronyms to master</li>
+                    <li>60-second challenges</li>
+                    <li>Track high scores per topic</li>
+                </ul>
+                <div class="game-status status-live">🟢 PLAY NOW</div>
+            </a>
+
+            <!-- HR Simulator - Coming Soon -->
+            <div class="game-card" style="opacity: 0.7; cursor: default;">
+                <div class="game-icon">🏢</div>
+                <h2 class="game-title">HR Simulator</h2>
+                <p class="game-description">
+                    Manage an HR department, make tough decisions, and balance budgets vs. employee satisfaction!
+                </p>
+                <ul class="game-features">
+                    <li>Hiring & firing decisions</li>
+                    <li>Budget management</li>
+                    <li>Compliance challenges</li>
+                    <li>Employee satisfaction tracking</li>
+                </ul>
+                <div class="game-status status-coming">🚧 COMING SOON</div>
+            </div>
+
+            <!-- Escape the Office - Coming Soon -->
+            <div class="game-card" style="opacity: 0.7; cursor: default;">
+                <div class="game-icon">🔍</div>
+                <h2 class="game-title">Escape the Office</h2>
+                <p class="game-description">
+                    Solve HR-themed puzzles and riddles to escape before the audit deadline!
+                </p>
+                <ul class="game-features">
+                    <li>Policy-based puzzles</li>
+                    <li>Document detective work</li>
+                    <li>Time-based challenges</li>
+                    <li>Multiple difficulty levels</li>
+                </ul>
+                <div class="game-status status-coming">🚧 COMING SOON</div>
+            </div>
+
+            <!-- AI Pet - Coming Soon -->
+            <div class="game-card" style="opacity: 0.7; cursor: default;">
+                <div class="game-icon">🐾</div>
+                <h2 class="game-title">AI Companion</h2>
+                <p class="game-description">
+                    Your own AI pet that learns, remembers, and evolves based on your interactions!
+                </p>
+                <ul class="game-features">
+                    <li>AI-powered personality</li>
+                    <li>Mood & needs system</li>
+                    <li>Memory of past conversations</li>
+                    <li>Evolving relationships</li>
+                </ul>
+                <div class="game-status status-coming">🚧 COMING SOON</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built by <a href="https://amybray-systems.github.io/portfolio/" target="_blank">Amy Bray</a></p>
+            <p style="margin-top: 10px; opacity: 0.8;">More games coming soon!</p>
+        </div>
+    </div>
+</body>
+</html>
