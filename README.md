@@ -58,24 +58,6 @@ Your own AI-powered virtual pet that learns, remembers, and evolves based on you
 ### Play Online
 Simply visit [https://amybray-systems.github.io/hr-games/](https://amybray-systems.github.io/hr-games/) and start playing!
 
-### Run Locally
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/amybray-systems/hr-games.git
-   ```
-2. Open `index.html` in your browser
-3. Or use a local server:
-   ```bash
-   # With Python
-   python -m http.server 8000
-   
-   # With Node.js
-   npx http-server
-   ```
-4. Navigate to `http://localhost:8000`
-
----
-
 ## 📂 Project Structure
 
 ```
@@ -134,9 +116,9 @@ Built by **Amy Bray** - HR Technology Specialist & Developer
 ## 🎯 Roadmap
 
 - [x] Acronym Attack - Launch with 5 topics
-- [ ] HR Simulator - Q1 2025
-- [ ] Escape the Office - Q2 2025
-- [ ] AI Companion - Q2 2025
+- [ ] HR Simulator - Q1 2026
+- [ ] Escape the Office - Q1 2026
+- [ ] AI Companion - Q2 2026
 - [ ] Leaderboard system (cloud-based)
 - [ ] Multiplayer modes
 - [ ] Achievement system
