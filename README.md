@@ -12,18 +12,19 @@ A collection of fun, educational games for HR professionals, tech enthusiasts, a
 Test your knowledge of HR, Salesforce, Azure, and AI acronyms in this fast-paced quiz game!
 
 **Features:**
-- 5 topic categories: HR, Salesforce, Azure AI, Azure Cloud, and Mixed
-- 67+ acronyms to master
+- 6 topic categories: HR, Salesforce, Azure AI, Azure Cloud, Context Matters, and Mixed
+- 95+ acronyms to master
 - 60-second timed challenges
 - Separate high scores for each topic
 - Streak counter for consecutive correct answers
 - Mobile-responsive design
 
 **Topics Include:**
-- 👥 **Human Resources** - HRIS, ATS, FMLA, EOR, PEO, and more
-- ☁️ **Salesforce** - SFDC, SOQL, LWC, CPQ, Apex, and more
-- 🤖 **Azure AI** - ML, NLP, LLM, GPT, RAG, and more
-- ☁️ **Azure Cloud** - VM, VNet, AKS, ARM, Blob, and more
+- 👥 **Human Resources** - HRIS, ATS, FMLA, EOR, PEO, and more (22 acronyms)
+- ☁️ **Salesforce** - SFDC, SOQL, LWC, CPQ, Apex, and more (15 acronyms)
+- 🤖 **Azure AI** - ML, NLP, LLM, GPT, RAG, and more (15 acronyms)
+- ☁️ **Azure Cloud** - VM, VNet, AKS, ARM, Blob, and more (15 acronyms)
+- 🧠 **Context Matters** - Same acronym, different meanings! Can you pick the right one based on context? (28 acronyms)
 - 🎲 **Mixed** - All topics combined for the ultimate challenge!
 
 [**Play Acronym Attack →**](https://amybray-systems.github.io/hr-games/acronym-attack/)
@@ -57,6 +58,24 @@ Your own AI-powered virtual pet that learns, remembers, and evolves based on you
 
 ### Play Online
 Simply visit [https://amybray-systems.github.io/hr-games/](https://amybray-systems.github.io/hr-games/) and start playing!
+
+### Run Locally
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/amybray-systems/hr-games.git
+   ```
+2. Open `index.html` in your browser
+3. Or use a local server:
+   ```bash
+   # With Python
+   python -m http.server 8000
+   
+   # With Node.js
+   npx http-server
+   ```
+4. Navigate to `http://localhost:8000`
+
+---
 
 ## 📂 Project Structure
 
@@ -116,9 +135,9 @@ Built by **Amy Bray** - HR Technology Specialist & Developer
 ## 🎯 Roadmap
 
 - [x] Acronym Attack - Launch with 5 topics
-- [ ] HR Simulator - Q1 2026
-- [ ] Escape the Office - Q1 2026
-- [ ] AI Companion - Q2 2026
+- [ ] HR Simulator - Q1 2025
+- [ ] Escape the Office - Q2 2025
+- [ ] AI Companion - Q2 2025
 - [ ] Leaderboard system (cloud-based)
 - [ ] Multiplayer modes
 - [ ] Achievement system
