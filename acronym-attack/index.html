@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acronym Attack | HR Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f7f9fc;
+            border-radius: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .game-area {
+            margin-bottom: 30px;
+        }
+
+        .acronym-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .acronym {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .category {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+            background: #f7f9fc;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option-btn.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .start-screen, .topic-screen, .end-screen {
+            text-align: center;
+        }
+
+        .start-btn, .restart-btn, .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover, .restart-btn:hover, .back-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .topic-btn {
+            padding: 30px 20px;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .topic-btn:hover {
+            border-color: #667eea;
+            background: #f7f9fc;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .topic-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .topic-count {
+            font-size: 0.8em;
+            color: #999;
+            font-weight: normal;
+            margin-top: 5px;
+        }
+
+        .high-scores {
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .high-scores h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .high-score-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .high-score-item:last-child {
+            border-bottom: none;
+        }
+
+        .instructions {
+            text-align: left;
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .score-display {
+            font-size: 2em;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .current-topic {
+            background: #f7f9fc;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .acronym {
+                font-size: 2em;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🎯 Acronym Attack</h1>
+            <p class="tagline">Match acronyms before time runs out!</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="start-screen">
+            <div class="instructions">
+                <h3 style="margin-bottom: 15px; color: #667eea;">How to Play:</h3>
+                <ul>
+                    <li>Choose your topic</li>
+                    <li>Match each acronym to its correct meaning</li>
+                    <li>You have 60 seconds to score as many points as possible</li>
+                    <li>Correct answers: +10 points</li>
+                    <li>Wrong answers: -5 points</li>
+                    <li>Beat your high score in each category!</li>
+                </ul>
+            </div>
+            <button class="start-btn" onclick="showTopicScreen()">Choose Topic</button>
+        </div>
+
+        <!-- Topic Selection Screen -->
+        <div id="topicScreen" class="topic-screen hidden">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Choose Your Challenge</h2>
+            
+            <div class="topic-grid">
+                <button class="topic-btn" onclick="selectTopic('hr')">
+                    <div class="topic-icon">👥</div>
+                    <div>Human Resources</div>
+                    <div class="topic-count" id="hrCount">0 acronyms</div>
+                </button>
+                
+                <button class="topic-btn" onclick="selectTopic('salesforce')">
+                    <div class="topic-icon">☁️</div>
+                    <div>Salesforce</div>
+                    <div class="topic-count" id="salesforceCount">0 acronyms</div>
+                </button>
+                
+                <button class="topic-btn" onclick="selectTopic('azure-ai')">
+                    <div class="topic-icon">🤖</div>
+                    <div>Azure AI</div>
+                    <div class="topic-count" id="azureAiCount">0 acronyms</div>
+                </button>
+                
+                <button class="topic-btn" onclick="selectTopic('azure')">
+                    <div class="topic-icon">☁️</div>
+                    <div>Azure Cloud</div>
+                    <div class="topic-count" id="azureCount">0 acronyms</div>
+                </button>
+                
+                <button class="topic-btn" onclick="selectTopic('mixed')" style="grid-column: 1 / -1;">
+                    <div class="topic-icon">🎲</div>
+                    <div>Mixed - All Topics</div>
+                    <div class="topic-count" id="mixedCount">0 acronyms</div>
+                </button>
+            </div>
+
+            <div class="high-scores" id="highScoresDisplay">
+                <h3>🏆 High Scores</h3>
+                <div id="highScoresList"></div>
+            </div>
+
+            <button class="back-btn" onclick="showWelcome()">← Back</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div class="current-topic" id="currentTopicDisplay"></div>
+                <button onclick="quitGame()" style="background: #f44336; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9em;">Exit Game</button>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Time</div>
+                    <div class="stat-value" id="timer">60</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Streak</div>
+                    <div class="stat-value" id="streak">0</div>
+                </div>
+            </div>
+
+            <div id="feedback" class="feedback hidden"></div>
+
+            <div class="game-area">
+                <div class="acronym-display">
+                    <div class="acronym" id="acronym">HRIS</div>
+                    <div class="category" id="category">HR Technology</div>
+                </div>
+
+                <div class="options" id="options">
+                    <!-- Options will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" class="end-screen hidden">
+            <h2 style="color: #667eea; margin-bottom: 20px;">Game Over!</h2>
+            <div class="current-topic" id="endTopicDisplay"></div>
+            <div class="score-display">
+                Final Score: <span id="finalScore">0</span>
+            </div>
+            <div id="newRecord" class="hidden" style="color: #4caf50; font-size: 1.5em; margin: 10px 0;">
+                🎉 NEW HIGH SCORE! 🎉
+            </div>
+            <div style="color: #764ba2; font-size: 1.2em; margin: 10px 0;">
+                High Score: <span id="topicHighScore">0</span>
+            </div>
+            <button class="restart-btn" onclick="showTopicScreen()">Play Again</button>
+            <button class="back-btn" onclick="showWelcome()" style="margin-left: 10px;">Back to Menu</button>
+        </div>
+    </div>
+
+    <script>
+        const acronymData = {
+            'hr': [
+                // HR Technology
+                { acronym: "HRIS", meaning: "Human Resource Information System", wrong: ["Human Resources Integration Service", "Hiring Resource Information Standard", "HR Internal System"], category: "HR Technology" },
+                { acronym: "ATS", meaning: "Applicant Tracking System", wrong: ["Application Technology Service", "Automated Talent Search", "Advanced Training System"], category: "HR Technology" },
+                { acronym: "LMS", meaning: "Learning Management System", wrong: ["Labor Management Software", "Leadership Monitoring System", "Leave Management Service"], category: "HR Technology" },
+                { acronym: "HRMS", meaning: "Human Resource Management System", wrong: ["HR Monitoring Service", "Hiring Resource Management Software", "Human Relations Metrics System"], category: "HR Technology" },
+                
+                // Compensation & Benefits
+                { acronym: "PTO", meaning: "Paid Time Off", wrong: ["Personal Time Option", "Professional Training Opportunity", "Part Time Only"], category: "Benefits" },
+                { acronym: "FSA", meaning: "Flexible Spending Account", wrong: ["Federal Savings Account", "Financial Support Allowance", "Fixed Salary Arrangement"], category: "Benefits" },
+                { acronym: "HSA", meaning: "Health Savings Account", wrong: ["Healthcare Service Agreement", "Human Services Agency", "Hybrid Salary Adjustment"], category: "Benefits" },
+                { acronym: "COBRA", meaning: "Consolidated Omnibus Budget Reconciliation Act", wrong: ["Company Benefits Rollover Agreement", "Continuing Benefits Recovery Act", "Corporate Obligation Benefits Regulation"], category: "Benefits" },
+                { acronym: "401k", meaning: "Retirement Savings Plan", wrong: ["Four-O-One Thousand", "Federal Retirement Account", "Fortune One Savings"], category: "Benefits" },
+                
+                // Employment Law
+                { acronym: "FMLA", meaning: "Family and Medical Leave Act", wrong: ["Federal Medical Labor Act", "Family Management Leave Authorization", "Full Medical Leave Allowance"], category: "Employment Law" },
+                { acronym: "FLSA", meaning: "Fair Labor Standards Act", wrong: ["Federal Labor Service Agreement", "Full Labor Standards Authorization", "Fair Leave Service Act"], category: "Employment Law" },
+                { acronym: "EEO", meaning: "Equal Employment Opportunity", wrong: ["Employee Engagement Office", "Executive Employment Order", "External Employment Organization"], category: "Employment Law" },
+                { acronym: "ADA", meaning: "Americans with Disabilities Act", wrong: ["American Development Agreement", "Automated Disability Assessment", "Advanced Diversity Act"], category: "Employment Law" },
+                { acronym: "EEOC", meaning: "Equal Employment Opportunity Commission", wrong: ["Employee Engagement Operations Center", "Executive Employment Oversight Committee", "Equal Enterprise Operations Council"], category: "Employment Law" },
+                
+                // Workforce Management
+                { acronym: "EOR", meaning: "Employer of Record", wrong: ["Employee Operations Report", "External Organizational Resource", "Employment Oversight Registry"], category: "Workforce" },
+                { acronym: "PEO", meaning: "Professional Employer Organization", wrong: ["Personnel Efficiency Operations", "Performance Evaluation Office", "Primary Employment Operator"], category: "Workforce" },
+                { acronym: "VMS", meaning: "Vendor Management System", wrong: ["Variable Management Software", "Virtual Monitoring Service", "Verification Management Standard"], category: "Workforce" },
+                { acronym: "SOW", meaning: "Statement of Work", wrong: ["Scope of Workers", "Service Order Workflow", "Standard Operations Weekly"], category: "Workforce" },
+                { acronym: "FTE", meaning: "Full-Time Equivalent", wrong: ["Full Time Employee", "Flexible Time Employment", "Federal Tax Exemption"], category: "Workforce" },
+                
+                // Performance & Development
+                { acronym: "KPI", meaning: "Key Performance Indicator", wrong: ["Knowledge Process Integration", "Key Personnel Information", "Kinetic Performance Index"], category: "Performance" },
+                { acronym: "OKR", meaning: "Objectives and Key Results", wrong: ["Operational Knowledge Repository", "Organizational KPI Review", "Outcome Key Ratings"], category: "Performance" },
+                { acronym: "PIP", meaning: "Performance Improvement Plan", wrong: ["Personnel Integration Program", "Productivity Incentive Plan", "Professional Implementation Process"], category: "Performance" }
+            ],
+            
+            'salesforce': [
+                { acronym: "SFDC", meaning: "Salesforce Dot Com", wrong: ["Sales Force Data Center", "Secure File Distribution Cloud", "System Framework Development Console"], category: "Platform" },
+                { acronym: "CRM", meaning: "Customer Relationship Management", wrong: ["Client Resource Monitor", "Corporate Records Management", "Communication Response Module"], category: "Platform" },
+                { acronym: "SOQL", meaning: "Salesforce Object Query Language", wrong: ["Standard Object Query Logic", "System Operations Query Language", "Secure Online Query Library"], category: "Development" },
+                { acronym: "SOSL", meaning: "Salesforce Object Search Language", wrong: ["System Object Search Library", "Secure Online Search Logic", "Standard Operations Search Language"], category: "Development" },
+                { acronym: "DML", meaning: "Data Manipulation Language", wrong: ["Database Management Logic", "Direct Memory Load", "Data Modeling Language"], category: "Development" },
+                { acronym: "LWC", meaning: "Lightning Web Components", wrong: ["Local Web Cache", "Lightning Workflow Configuration", "Live Web Content"], category: "Development" },
+                { acronym: "Apex", meaning: "Salesforce Programming Language", wrong: ["Application Execution Platform", "Advanced Programming Extension", "Automated Process Executor"], category: "Development" },
+                { acronym: "VF", meaning: "Visualforce", wrong: ["Virtual Framework", "View Format", "Validation Function"], category: "Development" },
+                { acronym: "CPQ", meaning: "Configure Price Quote", wrong: ["Customer Product Query", "Central Pricing Queue", "Custom Product Qualification"], category: "Sales Cloud" },
+                { acronym: "FSL", meaning: "Field Service Lightning", wrong: ["Fast Service Lookup", "Field Status Log", "Frontend Service Layer"], category: "Service Cloud" },
+                { acronym: "SSO", meaning: "Single Sign-On", wrong: ["Secure System Operations", "Standard Security Option", "Sales Service Optimization"], category: "Security" },
+                { acronym: "MFA", meaning: "Multi-Factor Authentication", wrong: ["Multiple File Access", "Managed Function Authorization", "Master Field Assignment"], category: "Security" },
+                { acronym: "AppExchange", meaning: "Salesforce App Marketplace", wrong: ["Application Exchange Program", "API Extension Channel", "Approved Exchange"], category: "Platform" },
+                { acronym: "Sandbox", meaning: "Development Environment", wrong: ["Security And Network Data Box", "System Analysis Database", "Secure Application Network"], category: "Development" },
+                { acronym: "SFDX", meaning: "Salesforce Developer Experience", wrong: ["Salesforce Data Exchange", "System Framework Development Extension", "Secure File Distribution Exchange"], category: "Development" }
+            ],
+            
+            'azure-ai': [
+                { acronym: "AI", meaning: "Artificial Intelligence", wrong: ["Automated Integration", "Application Interface", "Advanced Indexing"], category: "AI Fundamentals" },
+                { acronym: "ML", meaning: "Machine Learning", wrong: ["Memory Load", "Multiple Layers", "Master Library"], category: "AI Fundamentals" },
+                { acronym: "NLP", meaning: "Natural Language Processing", wrong: ["Network Layer Protocol", "New Learning Platform", "Node Level Programming"], category: "AI Services" },
+                { acronym: "LLM", meaning: "Large Language Model", wrong: ["Local Learning Module", "Linear Logic Machine", "Language Library Manager"], category: "AI Models" },
+                { acronym: "GPT", meaning: "Generative Pre-trained Transformer", wrong: ["General Purpose Technology", "Global Processing Tool", "Graphics Processing Technique"], category: "AI Models" },
+                { acronym: "RAG", meaning: "Retrieval Augmented Generation", wrong: ["Random Access Gateway", "Resource Allocation Grid", "Runtime Application Generator"], category: "AI Techniques" },
+                { acronym: "SDK", meaning: "Software Development Kit", wrong: ["System Data Kernel", "Secure Development Key", "Standard Deployment Kit"], category: "Development" },
+                { acronym: "API", meaning: "Application Programming Interface", wrong: ["Automated Process Integration", "Advanced Program Interaction", "Application Process Indicator"], category: "Development" },
+                { acronym: "REST", meaning: "Representational State Transfer", wrong: ["Remote Execution Service Tool", "Resource Evaluation System Technology", "Runtime Execution State Transfer"], category: "APIs" },
+                { acronym: "JSON", meaning: "JavaScript Object Notation", wrong: ["Joint System Object Network", "Java Standard Output Node", "JavaScript Online Network"], category: "Data Formats" },
+                { acronym: "OCR", meaning: "Optical Character Recognition", wrong: ["Online Content Reader", "Object Classification Registry", "Operational Command Response"], category: "AI Services" },
+                { acronym: "CV", meaning: "Computer Vision", wrong: ["Central Validation", "Content Viewer", "Cloud Virtualization"], category: "AI Services" },
+                { acronym: "TTS", meaning: "Text to Speech", wrong: ["Transfer Time System", "Technical Training Service", "Transaction Tracking System"], category: "AI Services" },
+                { acronym: "STT", meaning: "Speech to Text", wrong: ["System Transfer Tool", "Security Token Translation", "Standard Testing Template"], category: "AI Services" },
+                { acronym: "CNN", meaning: "Convolutional Neural Network", wrong: ["Central Network Node", "Cloud Native Network", "Computerized Neural Navigator"], category: "AI Models" }
+            ],
+            
+            'azure': [
+                { acronym: "VM", meaning: "Virtual Machine", wrong: ["Version Manager", "Volume Mount", "Virtual Memory"], category: "Compute" },
+                { acronym: "VNet", meaning: "Virtual Network", wrong: ["Version Network", "Verified Network", "Volume Network"], category: "Networking" },
+                { acronym: "ARM", meaning: "Azure Resource Manager", wrong: ["Application Runtime Manager", "Advanced Resource Monitoring", "Automated Resource Management"], category: "Management" },
+                { acronym: "AAD", meaning: "Azure Active Directory", wrong: ["Advanced Application Development", "Automated Access Database", "Azure Administration Dashboard"], category: "Identity" },
+                { acronym: "ACR", meaning: "Azure Container Registry", wrong: ["Application Configuration Repository", "Automated Cloud Replication", "Azure Compute Resources"], category: "Containers" },
+                { acronym: "AKS", meaning: "Azure Kubernetes Service", wrong: ["Automated Key Storage", "Application Kernel System", "Azure Knowledge Service"], category: "Containers" },
+                { acronym: "Blob", meaning: "Binary Large Object", wrong: ["Basic Location Object Block", "Binary Logic Object Base", "Backup Location Object"], category: "Storage" },
+                { acronym: "NSG", meaning: "Network Security Group", wrong: ["Node Service Gateway", "Network Storage Grid", "New Security Gateway"], category: "Security" },
+                { acronym: "ASE", meaning: "App Service Environment", wrong: ["Azure Storage Endpoint", "Application Security Engine", "Automated Service Execution"], category: "Compute" },
+                { acronym: "CDN", meaning: "Content Delivery Network", wrong: ["Central Data Node", "Cloud Distribution Network", "Centralized Deployment Network"], category: "Networking" },
+                { acronym: "SQL", meaning: "Structured Query Language", wrong: ["System Query Library", "Secure Query Logic", "Standard Queue Language"], category: "Database" },
+                { acronym: "CosmosDB", meaning: "Azure Cosmos Database", wrong: ["Corporate System Database", "Cloud Operations Storage Database", "Centralized Object Storage Management"], category: "Database" },
+                { acronym: "RBAC", meaning: "Role-Based Access Control", wrong: ["Resource Backup And Configuration", "Runtime Based Application Control", "Remote Business Access Center"], category: "Security" },
+                { acronym: "SAS", meaning: "Shared Access Signature", wrong: ["System Administration Service", "Secure Application Storage", "Software As Service"], category: "Security" },
+                { acronym: "DNS", meaning: "Domain Name System", wrong: ["Data Network Service", "Dynamic Node Storage", "Database Naming Standard"], category: "Networking" }
+            ]
+        };
+
+        let selectedTopic = '';
+        let score = 0;
+        let timeLeft = 60;
+        let streak = 0;
+        let timer;
+        let usedAcronyms = [];
+        let currentQuestion;
+        let gameAcronyms = [];
+
+        // Initialize counts
+        window.onload = function() {
+            updateAcronymCounts();
+            displayHighScores();
+        };
+
+        function updateAcronymCounts() {
+            document.getElementById('hrCount').textContent = `${acronymData['hr'].length} acronyms`;
+            document.getElementById('salesforceCount').textContent = `${acronymData['salesforce'].length} acronyms`;
+            document.getElementById('azureAiCount').textContent = `${acronymData['azure-ai'].length} acronyms`;
+            document.getElementById('azureCount').textContent = `${acronymData['azure'].length} acronyms`;
+            
+            const totalCount = Object.values(acronymData).reduce((sum, arr) => sum + arr.length, 0);
+            document.getElementById('mixedCount').textContent = `${totalCount} acronyms`;
+        }
+
+        function showWelcome() {
+            document.getElementById('topicScreen').classList.add('hidden');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+        }
+
+        function showTopicScreen() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('topicScreen').classList.remove('hidden');
+            displayHighScores();
+        }
+
+        function displayHighScores() {
+            const topics = ['hr', 'salesforce', 'azure-ai', 'azure', 'mixed'];
+            const topicNames = {
+                'hr': '👥 Human Resources',
+                'salesforce': '☁️ Salesforce',
+                'azure-ai': '🤖 Azure AI',
+                'azure': '☁️ Azure Cloud',
+                'mixed': '🎲 Mixed'
+            };
+            
+            let html = '';
+            topics.forEach(topic => {
+                const score = localStorage.getItem(`acronymAttack_${topic}`) || 0;
+                if (score > 0) {
+                    html += `
+                        <div class="high-score-item">
+                            <span>${topicNames[topic]}</span>
+                            <span style="color: #667eea; font-weight: bold;">${score}</span>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (html === '') {
+                html = '<div style="color: #999; text-align: center;">No high scores yet. Start playing!</div>';
+            }
+            
+            document.getElementById('highScoresList').innerHTML = html;
+        }
+
+        function selectTopic(topic) {
+            selectedTopic = topic;
+            
+            // Get acronyms for selected topic
+            if (topic === 'mixed') {
+                gameAcronyms = Object.values(acronymData).flat();
+            } else {
+                gameAcronyms = acronymData[topic];
+            }
+            
+            startGame();
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 60;
+            streak = 0;
+            usedAcronyms = [];
+            
+            const topicNames = {
+                'hr': '👥 Human Resources',
+                'salesforce': '☁️ Salesforce',
+                'azure-ai': '🤖 Azure AI',
+                'azure': '☁️ Azure Cloud',
+                'mixed': '🎲 Mixed - All Topics'
+            };
+            
+            document.getElementById('currentTopicDisplay').textContent = topicNames[selectedTopic];
+            
+            document.getElementById('topicScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            updateDisplay();
+            loadQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        function loadQuestion() {
+            // Reset used acronyms if we've gone through all of them
+            if (usedAcronyms.length === gameAcronyms.length) {
+                usedAcronyms = [];
+            }
+
+            // Get a random unused acronym
+            let availableAcronyms = gameAcronyms.filter(a => !usedAcronyms.includes(a.acronym));
+            currentQuestion = availableAcronyms[Math.floor(Math.random() * availableAcronyms.length)];
+            usedAcronyms.push(currentQuestion.acronym);
+
+            // Display acronym
+            document.getElementById('acronym').textContent = currentQuestion.acronym;
+            document.getElementById('category').textContent = currentQuestion.category;
+
+            // Create options (1 correct + 3 wrong, shuffled)
+            let options = [currentQuestion.meaning, ...currentQuestion.wrong];
+            options = options.sort(() => Math.random() - 0.5);
+
+            // Display options
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Hide feedback
+            document.getElementById('feedback').classList.add('hidden');
+        }
+
+        function checkAnswer(selected, btn) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(b => b.disabled = true);
+
+            const feedback = document.getElementById('feedback');
+            
+            if (selected === currentQuestion.meaning) {
+                score += 10;
+                streak++;
+                btn.classList.add('correct');
+                feedback.textContent = `✓ Correct! +10 points | Streak: ${streak}`;
+                feedback.className = 'feedback correct';
+            } else {
+                score -= 5;
+                streak = 0;
+                btn.classList.add('incorrect');
+                // Highlight the correct answer
+                allButtons.forEach(b => {
+                    if (b.textContent === currentQuestion.meaning) {
+                        b.classList.add('correct');
+                    }
+                });
+                feedback.textContent = '✗ Wrong! -5 points | Streak reset';
+                feedback.className = 'feedback incorrect';
+            }
+
+            feedback.classList.remove('hidden');
+            updateDisplay();
+
+            setTimeout(() => {
+                loadQuestion();
+            }, 1500);
+        }
+
+        function updateDisplay() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function quitGame() {
+            if (confirm('Are you sure you want to quit? Your progress will be lost.')) {
+                clearInterval(timer);
+                document.getElementById('gameScreen').classList.add('hidden');
+                showTopicScreen();
+            }
+        }
+
+        function endGame() {
+            clearInterval(timer);
+            
+            const topicNames = {
+                'hr': '👥 Human Resources',
+                'salesforce': '☁️ Salesforce',
+                'azure-ai': '🤖 Azure AI',
+                'azure': '☁️ Azure Cloud',
+                'mixed': '🎲 Mixed - All Topics'
+            };
+            
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+            
+            document.getElementById('endTopicDisplay').textContent = topicNames[selectedTopic];
+            document.getElementById('finalScore').textContent = score;
+            
+            // Update high score for this topic
+            const storageKey = `acronymAttack_${selectedTopic}`;
+            const highScore = localStorage.getItem(storageKey) || 0;
+            
+            if (score > highScore) {
+                localStorage.setItem(storageKey, score);
+                document.getElementById('topicHighScore').textContent = score;
+                document.getElementById('newRecord').classList.remove('hidden');
+            } else {
+                document.getElementById('topicHighScore').textContent = highScore;
+                document.getElementById('newRecord').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
