@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Red Flag Review — HR Game</title>
+<style>
+  :root{
+    --bg1:#667eea; --bg2:#764ba2;
+    --card:#ffffff; --text:#222; --muted:#666;
+    --ok:#2e7d32; --warn:#e65100; --chip:#eef2ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    color:var(--text);
+    padding:32px 16px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .shell{width:100%;max-width:960px}
+  header{color:#fff;text-align:center;margin-bottom:28px}
+  header h1{font-size:2.4rem;text-shadow:0 2px 6px rgba(0,0,0,.25)}
+  header p{opacity:.95;margin-top:8px}
+
+  .topbar{
+    display:flex;gap:12px;align-items:center;justify-content:space-between;
+    color:#fff;margin:16px 0 8px;
+  }
+  .topbar .stats{display:flex;gap:12px;flex-wrap:wrap}
+  .pill{
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+    padding:8px 12px;border-radius:999px;font-weight:600
+  }
+
+  .game{
+    background:var(--card);border-radius:20px;padding:22px;
+    box-shadow:0 10px 32px rgba(0,0,0,.25);
+  }
+
+  .controls{
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:16px
+  }
+  select,button{
+    border:1px solid #e5e7eb;border-radius:12px;padding:10px 14px;
+    font-size:0.95rem;background:#fff;cursor:pointer
+  }
+  button.primary{background:#4f46e5;color:#fff;border-color:#4f46e5}
+  button.ghost{background:#fff}
+  button:disabled{opacity:.5;cursor:not-allowed}
+
+  .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 2px}
+  .badge{
+    background:var(--chip);color:#444;border:1px solid #e5e7eb;
+    padding:6px 10px;border-radius:999px;font-size:.8rem;font-weight:700
+  }
+  .badge.earned{background:#e8f5e9;color:var(--ok);border-color:#c8e6c9}
+
+  .card{
+    margin-top:6px;background:#fff;border:1px solid #f0f0f0;border-radius:16px;padding:18px
+  }
+  .topic{
+    font-size:.8rem;font-weight:800;letter-spacing:.06em;
+    color:#4f46e5;margin-bottom:10px;text-transform:uppercase
+  }
+  .scenario{font-size:1.15rem;line-height:1.55;color:#222}
+  .meta{margin-top:10px;color:var(--muted);font-size:.9rem}
+
+  .actions{
+    display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:18px
+  }
+  .yes{background:#e8f5e9;color:var(--ok);border-color:#c8e6c9}
+  .no{background:#fff3e0;color:var(--warn);border-color:#ffe0b2}
+
+  .result{
+    text-align:center;margin-top:12px;font-weight:700
+  }
+  .result.ok{color:var(--ok)} .result.bad{color:#c62828}
+
+  .bottom{
+    display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:#444
+  }
+  .streak{font-weight:700}
+  .bar{height:10px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+  .bar>div{height:100%;background:#4f46e5;width:100%}
+
+  .leader{
+    margin-top:22px;border-top:2px solid #f3f4f6;padding-top:12px
+  }
+  .leader h3{font-size:1rem;margin-bottom:6px}
+  .leader ul{list-style:none}
+  .leader li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eee}
+  .muted{opacity:.7}
+
+  @media (max-width:640px){
+    .bottom{flex-direction:column;gap:10px;align-items:stretch}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <h1>🧭 Red Flag Review</h1>
+    <p>Decide fast: <strong>Red Flag</strong> or <strong>All Good</strong>. Earn streaks & topic badges before time runs out.</p>
+  </header>
+
+  <div class="topbar">
+    <div class="stats">
+      <div class="pill">⏱️ Time: <span id="time">90</span>s</div>
+      <div class="pill">⭐ Score: <span id="score">0</span></div>
+      <div class="pill">🔥 Streak: <span id="streak">0</span>x</div>
+    </div>
+    <div class="pill">🏅 Badges: <span id="badgeCount">0</span>/6</div>
+  </div>
+
+  <div class="game">
+    <div class="controls">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="topic">
+          <option value="ALL">All Topics</option>
+          <option value="I-9">I-9</option>
+          <option value="FLSA">FLSA</option>
+          <option value="Leave">Leave</option>
+          <option value="Privacy">Privacy</option>
+          <option value="Harassment">Harassment</option>
+          <option value="Classification">Classification</option>
+        </select>
+        <select id="duration">
+          <option value="90">90s</option>
+          <option value="120">120s</option>
+          <option value="60">60s</option>
+        </select>
+        <button id="start" class="primary">Start</button>
+        <button id="skip" class="ghost" disabled>Skip</button>
+      </div>
+      <button id="reset" class="ghost">Reset</button>
+    </div>
+
+    <div class="badge-row" id="badges">
+      <!-- badges populate here -->
+    </div>
+
+    <div class="card" id="card" aria-live="polite">
+      <div class="topic" id="cardTopic">Pick options & press Start</div>
+      <div class="scenario" id="scenario">
+        Choose a topic or play All Topics. You’ll see short scenarios; decide if it’s a <em>Red Flag</em> (policy/compliance risk) or <em>All Good</em>.
+      </div>
+      <div class="meta" id="meta">Correct answers grant points; streaks multiply your score.</div>
+      <div class="actions">
+        <button id="btnRed" class="no" disabled>🚩 Red Flag</button>
+        <button id="btnOk" class="yes" disabled>✅ All Good</button>
+      </div>
+      <div id="result" class="result muted">—</div>
+
+      <div class="bottom">
+        <div class="streak">Multiplier: <span id="mult">1.0x</span></div>
+        <div style="flex:1;margin-left:12px">
+          <div class="bar" role="progressbar" aria-label="Time remaining">
+            <div id="bar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="leader" id="leaderboard">
+      <h3>🏆 Local High Scores</h3>
+      <ul id="scores"></ul>
+      <p class="muted">Stored in your browser (localStorage).</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   Data: scenarios
+   type: "RED" means Red Flag; "OK" means All Good.
+   ========================= */
+const SCENARIOS = [
+  // I-9
+  {t:"I-9", s:"Remote new hire starts Monday. HR plans to verify I-9 docs via video call and accept photos.", a:"RED", why:"Remote verification requires authorized procedures (e.g., DHS remote exam program/agent). Photos alone aren’t sufficient."},
+  {t:"I-9", s:"Employee’s List B doc is expired, but it’s from the DHS COVID list that had temporary flexibility long ago.", a:"RED", why:"Temporary COVID flexibilities ended. Follow current DHS rules; expired List B usually not acceptable."},
+  {t:"I-9", s:"HR designates a local notary as authorized representative to inspect originals in person for a remote hire.", a:"OK",  why:"Authorized reps may complete Section 2 if trained; employer remains liable for errors."},
+
+  // FLSA
+  {t:"FLSA", s:"Exempt employee’s pay is docked 3 hours for leaving early once.", a:"RED", why:"Improper partial-day docking can jeopardize exemption (salary basis)."},
+  {t:"FLSA", s:"Non-exempt worker answers emails after hours without recording time to ‘help the team’.", a:"RED", why:"All hours worked must be tracked and paid (incl. OT where applicable)."},
+  {t:"FLSA", s:"Non-exempt employee eats lunch at their desk uninterrupted; it’s unpaid.", a:"OK",  why:"If meal is bona fide and fully relieved of duty, it may be unpaid."},
+
+  // Leave
+  {t:"Leave", s:"Qualified employee requests intermittent FMLA for medical treatments; HR approves.", a:"OK",  why:"Intermittent FMLA is allowed when medically necessary."},
+  {t:"Leave", s:"Manager asks for diagnosis details before approving a protected medical leave.", a:"RED", why:"Avoid requesting diagnosis; use certification forms and need-to-know basis."},
+
+  // Privacy
+  {t:"Privacy", s:"HR shares an employee’s vaccination status with their direct manager to plan coverage.", a:"OK",  why:"Share minimum necessary for business need; store separately from personnel file."},
+  {t:"Privacy", s:"Candidate data is sent to a vendor without a DPA or confidentiality provisions.", a:"RED", why:"Use DPAs and safeguards; limit data transfer to compliant vendors."},
+
+  // Harassment
+  {t:"Harassment", s:"A complaint about sexist jokes is ‘handled’ by quietly moving the complainant’s desk.", a:"RED", why:"Retaliation risk and inadequate response; investigate and address behavior."},
+  {t:"Harassment", s:"Bystander reports inappropriate DMs in a company chat; HR opens an investigation.", a:"OK",  why:"Prompt, impartial investigation is appropriate."},
+
+  // Classification (W2/1099)
+  {t:"Classification", s:"Manager wants to pay a 40-hr/week, on-site, supervised role as a 1099 for ‘flexibility’.", a:"RED", why:"Facts indicate employment; misclassification risk under IRS/ABC tests."},
+  {t:"Classification", s:"Specialist delivers a fixed-fee project using own tools, controls schedule, signs MSA.", a:"OK",  why:"Independent contractor indicators present; still review jurisdiction tests."},
+];
+
+/* =========================
+   State
+   ========================= */
+let state = {
+  playing:false, time:90, total:90,
+  score:0, streak:0, mult:1.0,
+  idx:0, order:[], current:null, topic:"ALL",
+  earned:new Set(), timer:null
+};
+
+const el = (id)=>document.getElementById(id);
+const topicSel = el('topic'), durSel = el('duration');
+const btnStart = el('start'), btnSkip = el('skip'), btnReset = el('reset');
+const btnRed = el('btnRed'), btnOk = el('btnOk');
+const timeEl = el('time'), scoreEl = el('score'), streakEl = el('streak');
+const multEl = el('mult'), barEl = el('bar'), resultEl = el('result');
+const topicEl = el('cardTopic'), scenEl = el('scenario'), metaEl = el('meta');
+const badgeRow = el('badges'), badgeCount = el('badgeCount');
+const scoresList = el('scores');
+
+const TOPICS = ["I-9","FLSA","Leave","Privacy","Harassment","Classification"];
+
+/* =========================
+   Badges UI
+   ========================= */
+function renderBadges(){
+  badgeRow.innerHTML = "";
+  TOPICS.forEach(t=>{
+    const b=document.createElement('span');
+    b.className='badge'+(state.earned.has(t)?' earned':'');
+    b.textContent = state.earned.has(t)? `🏅 ${t}` : t;
+    badgeRow.appendChild(b);
+  });
+  badgeCount.textContent = state.earned.size;
+}
+
+/* =========================
+   Utilities
+   ========================= */
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function poolByTopic(topic){
+  return topic==="ALL" ? SCENARIOS : SCENARIOS.filter(x=>x.t===topic);
+}
+
+function nextScenario(){
+  if(state.idx>=state.order.length){
+    // reshuffle for endless mode
+    state.order = shuffle(poolByTopic(state.topic));
+    state.idx = 0;
+  }
+  state.current = state.order[state.idx++];
+  topicEl.textContent = state.current.t;
+  scenEl.textContent = state.current.s;
+  metaEl.textContent = "Is this a policy/compliance RED FLAG or ALL GOOD?";
+  resultEl.textContent = "—";
+  resultEl.className = "result muted";
+}
+
+/* =========================
+   Scoring
+   ========================= */
+function award(correct){
+  if(correct){
+    state.streak++;
+    state.mult = Math.min(3, 1 + Math.floor(state.streak/3)*0.5); // 1.0→1.5→2.0→2.5→3.0
+    const base=100;
+    state.score += Math.round(base * state.mult);
+    // badge if 3 correct in a topic this run
+    if(state.streak>=3){
+      state.earned.add(state.current.t);
+      renderBadges();
+    }
+    resultEl.textContent = `✅ Correct! +${Math.round(100*state.mult)} (${state.current.why})`;
+    resultEl.className = "result ok";
+  } else {
+    resultEl.textContent = `❌ Not quite. ${state.current.why}`;
+    resultEl.className = "result bad";
+    state.streak = 0;
+    state.mult = 1.0;
+  }
+  scoreEl.textContent = state.score;
+  streakEl.textContent = state.streak;
+  multEl.textContent = `${state.mult.toFixed(1)}x`;
+}
+
+/* =========================
+   Timer
+   ========================= */
+function tick(){
+  state.time--;
+  timeEl.textContent = state.time;
+  const pct = Math.max(0, (state.time/state.total)*100);
+  barEl.style.width = pct+"%";
+  if(state.time<=0){ endGame(); }
+}
+
+function startTimer(){
+  stopTimer();
+  state.timer = setInterval(tick, 1000);
+}
+function stopTimer(){
+  if(state.timer){ clearInterval(state.timer); state.timer=null; }
+}
+
+/* =========================
+   Game lifecycle
+   ========================= */
+function startGame(){
+  state.playing = true;
+  state.topic = topicSel.value;
+  state.total = parseInt(durSel.value,10);
+  state.time = state.total;
+  state.score = 0; state.streak=0; state.mult=1.0;
+  state.earned = new Set();
+  scoreEl.textContent = "0"; streakEl.textContent="0"; multEl.textContent="1.0x"; timeEl.textContent=state.time;
+  renderBadges();
+  state.order = shuffle(poolByTopic(state.topic));
+  state.idx = 0;
+  btnRed.disabled = btnOk.disabled = btnSkip.disabled = false;
+  btnStart.disabled = true;
+  nextScenario();
+  startTimer();
+}
+
+function endGame(){
+  stopTimer();
+  btnRed.disabled = btnOk.disabled = btnSkip.disabled = true;
+  btnStart.disabled = false;
+  resultEl.textContent = `Game over! Final score: ${state.score}`;
+  resultEl.className = "result";
+  saveScore(state.score, state.topic, state.total, state.earned.size);
+  renderScores();
+}
+
+function resetGame(){
+  stopTimer();
+  state.playing=false;
+  btnRed.disabled = btnOk.disabled = btnSkip.disabled = true;
+  btnStart.disabled = false;
+  state.time = parseInt(durSel.value,10);
+  timeEl.textContent = state.time;
+  barEl.style.width="0%";
+  state.score=0; state.streak=0; state.mult=1.0;
+  scoreEl.textContent="0"; streakEl.textContent="0"; multEl.textContent="1.0x";
+  state.earned = new Set(); renderBadges();
+  topicEl.textContent="Pick options & press Start";
+  scenEl.textContent="Choose a topic or play All Topics. You’ll see short scenarios; decide if it’s a Red Flag or All Good.";
+  metaEl.textContent="Correct answers grant points; streaks multiply your score.";
+  resultEl.textContent="—"; resultEl.className="result muted";
+}
+
+/* =========================
+   Leaderboard (localStorage)
+   ========================= */
+const KEY="rfr_highscores_v1";
+function saveScore(score, topic, secs, badges){
+  const now=new Date().toISOString();
+  const row={score, topic, secs, badges, when:now};
+  const arr=JSON.parse(localStorage.getItem(KEY)||"[]");
+  arr.push(row);
+  arr.sort((a,b)=>b.score-a.score);
+  localStorage.setItem(KEY, JSON.stringify(arr.slice(0,10)));
+}
+function renderScores(){
+  const arr=JSON.parse(localStorage.getItem(KEY)||"[]");
+  scoresList.innerHTML = arr.length? "" : "<li class='muted'>No scores yet — play a round!</li>";
+  arr.forEach((r,i)=>{
+    const li=document.createElement('li');
+    const left = `#${i+1} • ${r.score}`;
+    const right = `${r.topic} • ${r.badges}🟡 • ${r.secs}s`;
+    li.innerHTML = `<span>${left}</span><span class="muted">${right}</span>`;
+    scoresList.appendChild(li);
+  });
+}
+
+/* =========================
+   Events
+   ========================= */
+btnStart.addEventListener('click', startGame);
+btnReset.addEventListener('click', resetGame);
+btnSkip.addEventListener('click', ()=>{
+  award(false); // optional: penalize skips
+  nextScenario();
+});
+btnRed.addEventListener('click', ()=>{
+  if(!state.current) return;
+  award(state.current.a==="RED");
+  nextScenario();
+});
+btnOk.addEventListener('click', ()=>{
+  if(!state.current) return;
+  award(state.current.a==="OK");
+  nextScenario();
+});
+topicSel.addEventListener('change', ()=>{ if(!state.playing) resetGame(); });
+durSel.addEventListener('change', ()=>{ if(!state.playing) resetGame(); });
+
+/* init */
+renderBadges(); renderScores();
+</script>
+</body>
+</html>
