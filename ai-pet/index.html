@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI Companion — Lite</title>
+<style>
+  :root{
+    --bg1:#667eea;--bg2:#764ba2;--panel:#fff;--ink:#222;--muted:#666;--accent:#4f46e5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    color:var(--ink);display:flex;justify-content:center;padding:28px 16px;
+  }
+  .shell{width:100%;max-width:980px}
+  header{color:#fff;text-align:center;margin-bottom:16px}
+  header h1{font-size:2rem;text-shadow:0 2px 6px rgba(0,0,0,.25)}
+  header p{opacity:.95;margin-top:6px}
+
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--panel);border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.25);padding:18px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  .avatar{
+    display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:12px
+  }
+  .face{
+    width:140px;height:140px;border-radius:999px;background:#f5f7ff;border:2px solid #e5e7eb;
+    display:grid;place-items:center;font-size:64px
+  }
+  .name{font-weight:800}
+  .badge{display:inline-block;padding:4px 10px;border-radius:999px;background:#e8f5e9;border:1px solid #c8e6c9;color:#1b5e20;font-weight:700;font-size:.8rem}
+
+  .kpi{margin:10px 0}
+  .kpi h4{font-size:.9rem;display:flex;justify-content:space-between;margin-bottom:6px}
+  .bar{height:12px;background:#eef2ff;border-radius:999px;border:1px solid #e5e7eb;overflow:hidden}
+  .bar>div{height:100%;background:var(--accent);width:50%;transition:width .3s}
+
+  .controls button, .controls input{
+    border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:8px 12px;font-size:.95rem;cursor:pointer
+  }
+  .controls button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .controls .ghost{background:#fff}
+  .muted{color:var(--muted)} .small{font-size:.9rem}
+
+  .feed{max-height:260px;overflow:auto;border:1px dashed #e5e7eb;border-radius:12px;padding:10px;background:#fcfcff}
+  .feed p{margin:6px 0;color:#333}
+  .feed .time{opacity:.6;font-size:.85rem;margin-right:6px}
+
+  .mems{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{background:#eef2ff;border:1px solid #e5e7eb;border-radius:999px;padding:4px 10px;font-size:.85rem}
+
+  .actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+  .actions button{padding:10px;border-radius:12px;border:1px solid #e5e7eb;background:#fff;cursor:pointer;text-align:left}
+  .actions button:hover{border-color:#c7d2fe;box-shadow:0 4px 12px rgba(79,70,229,.12)}
+
+  .footer{margin-top:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .pill{border:1px solid #e5e7eb;border-radius:999px;padding:6px 10px;font-weight:700;background:#fff}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <h1>🐾 AI Companion — Lite</h1>
+    <p>Keep your companion thriving by balancing <b>Energy</b>, <b>Clarity</b>, and <b>Recognition</b>. Actions affect mood and unlock ranks.</p>
+  </header>
+
+  <div class="grid">
+    <!-- LEFT: Companion + Needs -->
+    <section class="card">
+      <div class="avatar">
+        <div class="face" id="face">😊</div>
+        <div class="name" id="compName">Auni</div>
+        <span class="badge" id="rank">Novice</span>
+      </div>
+
+      <div class="kpi">
+        <h4>Energy <span id="enVal">70</span>/100</h4>
+        <div class="bar"><div id="enBar" style="width:70%"></div></div>
+      </div>
+      <div class="kpi">
+        <h4>Clarity <span id="clVal">60</span>/100</h4>
+        <div class="bar"><div id="clBar" style="width:60%"></div></div>
+      </div>
+      <div class="kpi">
+        <h4>Recognition <span id="rcVal">50</span>/100</h4>
+        <div class="bar"><div id="rcBar" style="width:50%"></div></div>
+      </div>
+
+      <div class="controls" style="margin-top:12px">
+        <input id="nameInput" placeholder="Name your companion…" />
+        <button id="saveName" class="ghost">Save Name</button>
+        <button id="reset" class="ghost">Reset</button>
+      </div>
+      <p class="muted small" style="margin-top:6px">Needs decay a little every minute (only while this tab is open).</p>
+    </section>
+
+    <!-- RIGHT: Feed + Actions -->
+    <section class="card">
+      <h3>Activity Feed</h3>
+      <div class="feed" id="feed"><p class="muted small">Say hi and take an action to begin.</p></div>
+
+      <div class="actions">
+        <button id="actRest">🛌 Rest — restore Energy</button>
+        <button id="actCoach">🧭 Coach — boost Clarity with a quick tip</button>
+        <button id="actKudos">🏅 Kudos — raise Recognition with praise</button>
+        <button id="actQuiz">🧠 Mini-Quiz — small HR/tech question</button>
+      </div>
+
+      <div class="footer">
+        <div class="pill">Mood: <span id="mood">Happy</span></div>
+        <div class="pill">Streak: <span id="streak">0</span></div>
+        <div class="pill">Saved: <span id="saved">Yes</span></div>
+      </div>
+
+      <div style="margin-top:10px">
+        <h4>Memory</h4>
+        <p class="small muted">Tell your companion up to 3 things to remember (e.g., “I’m studying Agentforce”).</p>
+        <div class="row" style="margin-top:6px">
+          <input id="memInput" placeholder="Add a memory…" style="flex:1"/>
+          <button id="addMem">Add</button>
+          <button id="clearMem" class="ghost">Clear</button>
+        </div>
+        <div class="mems" id="mems"></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+// ======= State =======
+const KEY="ai_companion_lite_v1";
+let S = {
+  name:"Auni",
+  energy:70, clarity:60, recog:50,
+  mood:"Happy", streak:0, rank:"Novice",
+  memories:[],
+  lastTick: Date.now()
+};
+
+// ======= Utils =======
+const $=id=>document.getElementById(id);
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function nowStr(){return new Date().toLocaleTimeString();}
+function faceFor(mood){
+  if(mood==="Happy") return "😊";
+  if(mood==="Focused") return "🧠";
+  if(mood==="Proud") return "😎";
+  if(mood==="Tired") return "🥱";
+  if(mood==="Grumpy") return "😕";
+  return "🙂";
+}
+function calcMood(){
+  if(S.energy<30) return "Tired";
+  if(S.clarity<35) return "Grumpy";
+  if(S.recog>70 && S.clarity>60) return "Proud";
+  if(S.clarity>70) return "Focused";
+  return "Happy";
+}
+function calcRank(){
+  const avg=(S.energy+S.clarity+S.recog)/3;
+  if(avg>=85 && S.streak>=8) return "Mentor";
+  if(avg>=75 && S.streak>=5) return "Senior";
+  if(avg>=60 && S.streak>=3) return "Apprentice";
+  return "Novice";
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); $('saved').textContent='Yes'; }
+function load(){
+  const raw=localStorage.getItem(KEY); if(!raw) return;
+  try{ S={...S, ...JSON.parse(raw)}; }catch(e){}
+}
+function log(msg){ const p=document.createElement('p'); p.innerHTML=`<span class="time">${nowStr()}</span>${msg}`; $('feed').prepend(p); }
+function render(){
+  $('compName').textContent = S.name;
+  $('enVal').textContent = S.energy; $('enBar').style.width = S.energy+'%';
+  $('clVal').textContent = S.clarity; $('clBar').style.width = S.clarity+'%';
+  $('rcVal').textContent = S.recog;   $('rcBar').style.width = S.recog+'%';
+  S.mood = calcMood(); $('mood').textContent = S.mood; $('face').textContent = faceFor(S.mood);
+  S.rank = calcRank(); $('rank').textContent = S.rank;
+  $('streak').textContent = S.streak;
+  renderMems();
+}
+function renderMems(){
+  const box=$('mems'); box.innerHTML='';
+  S.memories.forEach((m,i)=>{
+    const s=document.createElement('span');
+    s.className='chip'; s.textContent=`${i+1}. ${m}`;
+    box.appendChild(s);
+  });
+}
+
+// ======= Actions =======
+function actRest(){
+  S.energy = clamp(S.energy+18,0,100);
+  S.clarity = clamp(S.clarity+4,0,100);
+  S.recog   = clamp(S.recog-2,0,100);
+  S.streak++; log("You scheduled quiet time. Energy restored.");
+  afterAction();
+}
+function actCoach(){
+  const tips=[
+    "Use permission set groups to bundle least-privilege access.",
+    "I-9: originals must be inspected by an authorized rep.",
+    "Batch updates? Export → Edit → Validate → Import with backups.",
+    "For multi-state payroll, verify SUI rates each January.",
+    "Automate offboarding deprovision to cut access risk."
+  ];
+  S.clarity = clamp(S.clarity+14,0,100);
+  S.energy  = clamp(S.energy-5,0,100);
+  S.streak++; log(`Coaching tip: ${tips[Math.floor(Math.random()*tips.length)]}`);
+  afterAction();
+}
+function actKudos(){
+  const notes=[
+    "Great focus today!",
+    "That process doc was clean and helpful.",
+    "Nice call pushing for data quality.",
+    "Your empathy in 1:1s shows.",
+    "Owned that integration fix—well done!"
+  ];
+  S.recog = clamp(S.recog+16,0,100);
+  S.energy = clamp(S.energy+2,0,100);
+  S.streak++; log(`Kudos delivered: “${notes[Math.floor(Math.random()*notes.length)]}”`);
+  afterAction();
+}
+function actQuiz(){
+  const Q=[
+    {q:"Non-exempt employee reads email after hours. Must it be paid time?", a:true},
+    {q:"It’s okay to accept I-9 photos without in-person or authorized rep verification.", a:false},
+    {q:"Pay transparency laws may require salary ranges in job ads.", a:true},
+    {q:"Partial-day docking of exempt salaries is generally allowed.", a:false},
+    {q:"Offboarding should remove access on last day.", a:true},
+  ];
+  const item = Q[Math.floor(Math.random()*Q.length)];
+  const ok = confirm(item.q + "\n\nOK = True, Cancel = False");
+  const correct = (ok === item.a);
+  if(correct){ S.clarity = clamp(S.clarity+10,0,100); S.recog = clamp(S.recog+4,0,100); S.streak++; log("🧠 Quiz: Correct!"); }
+  else { S.streak=0; S.energy = clamp(S.energy-6,0,100); log("🧠 Quiz: Not quite—try another!"); }
+  afterAction();
+}
+function afterAction(){ $('saved').textContent='No'; render(); save(); }
+
+// ======= Decay loop (lightweight) =======
+function tick(){
+  const now=Date.now(); const mins=(now-S.lastTick)/60000;
+  if(mins>=1){
+    const steps=Math.floor(mins);
+    S.energy = clamp(S.energy - 2*steps, 0, 100);
+    S.clarity= clamp(S.clarity- 1*steps, 0, 100);
+    S.recog  = clamp(S.recog  - 1*steps, 0, 100);
+    S.streak = Math.max(0, S.streak - steps);
+    S.lastTick = now;
+    render(); save();
+  }
+}
+
+// ======= Memory =======
+function addMemory(){
+  const v=$('memInput').value.trim(); if(!v) return;
+  if(S.memories.length>=3){ alert("Max 3 memories in Lite mode."); return; }
+  S.memories.push(v); $('memInput').value=''; log(`📝 Remembering: “${v}”`);
+  afterAction();
+}
+function clearMemory(){ S.memories=[]; log("🧹 Cleared memories."); afterAction(); }
+
+// ======= Bindings & Init =======
+$('actRest').onclick = actRest;
+$('actCoach').onclick = actCoach;
+$('actKudos').onclick = actKudos;
+$('actQuiz').onclick  = actQuiz;
+$('addMem').onclick   = addMemory;
+$('clearMem').onclick = clearMemory;
+
+$('saveName').onclick = ()=>{ const v=$('nameInput').value.trim(); if(v){ S.name=v; $('nameInput').value=''; log(`Your companion is now named <b>${S.name}</b>.`); afterAction(); }};
+$('reset').onclick    = ()=>{ if(confirm("Reset companion?")){ localStorage.removeItem(KEY); location.reload(); } };
+
+load(); render(); save();
+setInterval(tick, 5000);
+</script>
+</body>
+</html>
