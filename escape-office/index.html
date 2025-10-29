@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape the Office | HR Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Scenario Selection */
+        .scenario-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(135deg, #f7f9fc 0%, #fff 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .scenario-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .scenario-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .scenario-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .scenario-title {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .scenario-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .scenario-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .lock-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #f44336;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        /* Game Screen */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f7f9fc;
+            border-radius: 10px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .stat-value.warning {
+            color: #f59e0b;
+        }
+
+        .stat-value.danger {
+            color: #ef4444;
+        }
+
+        /* Puzzle Display */
+        .puzzle-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 200px;
+        }
+
+        .puzzle-type {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .puzzle-question {
+            font-size: 1.3em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .puzzle-context {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-top: 15px;
+            border-left: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Answer Options */
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-btn {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            font-size: 1.05em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            background: #f7f9fc;
+            transform: translateX(5px);
+        }
+
+        .option-btn.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option-btn.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .feedback.incorrect {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .exit-btn {
+            background: #f44336;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            width: auto;
+            margin: 0;
+            display: inline-block;
+        }
+
+        /* Screens */
+        .hidden {
+            display: none;
+        }
+
+        .screen {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Instructions */
+        .instructions {
+            text-align: left;
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        /* End Screen */
+        .end-screen {
+            text-align: center;
+        }
+
+        .score-display {
+            font-size: 2.5em;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .escape-status {
+            font-size: 1.5em;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .escape-status.success {
+            color: #4caf50;
+        }
+
+        .escape-status.failed {
+            color: #f44336;
+        }
+
+        .stats-summary {
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .stats-summary div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .puzzle-question {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🔍 Escape the Office</h1>
+            <p class="tagline">Solve HR puzzles to escape!</p>
+        </div>
+
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="screen">
+            <div class="instructions">
+                <h3 style="margin-bottom: 15px; color: #667eea;">How to Play:</h3>
+                <ul>
+                    <li>Choose a scenario to escape from</li>
+                    <li>Solve 5 HR-themed puzzles correctly</li>
+                    <li>You have 5 minutes to complete each escape</li>
+                    <li>Wrong answers cost you 30 seconds!</li>
+                    <li>Complete scenarios to unlock new ones</li>
+                </ul>
+            </div>
+
+            <h3 style="color: #667eea; margin: 30px 0 20px;">Choose Your Escape:</h3>
+            
+            <div class="scenario-grid">
+                <div class="scenario-card" onclick="selectScenario('audit')">
+                    <div class="scenario-icon">🚨</div>
+                    <div class="scenario-title">Audit Panic</div>
+                    <div class="scenario-desc">
+                        The auditor arrives in 5 minutes! Find all the missing compliance documents before they discover the gaps.
+                    </div>
+                    <div class="scenario-stats">
+                        <span>⏱️ 5 Minutes</span>
+                        <span>📊 5 Puzzles</span>
+                        <span id="auditBest">🏆 --</span>
+                    </div>
+                </div>
+
+                <div class="scenario-card" id="bossCard" onclick="selectScenario('boss')">
+                    <div class="scenario-icon">⚡</div>
+                    <div class="scenario-title">Boss SOS</div>
+                    <div class="scenario-desc">
+                        Your boss needs urgent HR answers for a board meeting. Solve these emergencies FAST or face the consequences!
+                    </div>
+                    <div class="scenario-stats">
+                        <span>⏱️ 5 Minutes</span>
+                        <span>📊 5 Puzzles</span>
+                        <span id="bossBest">🏆 --</span>
+                    </div>
+                </div>
+
+                <div class="scenario-card" id="complianceCard" onclick="selectScenario('compliance')">
+                    <div class="scenario-icon">🔒</div>
+                    <div class="scenario-title">Compliance Escape</div>
+                    <div class="scenario-desc">
+                        You're trapped in compliance hell! Answer policy questions correctly to unlock each door and escape.
+                    </div>
+                    <div class="scenario-stats">
+                        <span>⏱️ 5 Minutes</span>
+                        <span>📊 5 Puzzles</span>
+                        <span id="complianceBest">🏆 --</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="scenarioTitle" style="color: #667eea;">Audit Panic</h2>
+                <button onclick="quitGame()" class="exit-btn">Exit</button>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-label">Time Left</div>
+                    <div class="stat-value" id="timer">5:00</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Progress</div>
+                    <div class="stat-value" id="progress">0/5</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+            </div>
+
+            <div id="feedback" class="feedback hidden"></div>
+
+            <div class="puzzle-container">
+                <div class="puzzle-type" id="puzzleType">HR Policy Riddle</div>
+                <div class="puzzle-question" id="puzzleQuestion">
+                    Loading puzzle...
+                </div>
+                <div class="puzzle-context hidden" id="puzzleContext"></div>
+            </div>
+
+            <div class="options" id="options">
+                <!-- Options will be inserted here -->
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="endScreen" class="screen hidden">
+            <div class="escape-status" id="escapeStatus">🎉 YOU ESCAPED!</div>
+            <div class="score-display">
+                Score: <span id="finalScore">0</span>
+            </div>
+
+            <div class="stats-summary">
+                <div>
+                    <span>Time Remaining:</span>
+                    <span id="timeRemaining">0:00</span>
+                </div>
+                <div>
+                    <span>Puzzles Solved:</span>
+                    <span id="puzzlesSolved">0/5</span>
+                </div>
+                <div>
+                    <span>Accuracy:</span>
+                    <span id="accuracy">0%</span>
+                </div>
+                <div style="border-top: 2px solid #e0e0e0; padding-top: 10px; margin-top: 10px; font-weight: bold;">
+                    <span>Best Score:</span>
+                    <span id="bestScore" style="color: #667eea;">0</span>
+                </div>
+            </div>
+
+            <button class="btn" onclick="showWelcome()">Back to Scenarios</button>
+            <button class="btn btn-secondary" onclick="retryScenario()">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let currentScenario = '';
+        let timeLeft = 300; // 5 minutes in seconds
+        let timer;
+        let currentPuzzleIndex = 0;
+        let score = 0;
+        let correctAnswers = 0;
+        let totalAttempts = 0;
+        let scenarioPuzzles = [];
+        let currentPuzzle;
+        let usedPuzzlesThisSession = []; // Track puzzles used across all scenarios in this session
+
+        // Puzzle database
+        const puzzleBank = {
+            policyRiddles: [
+                {
+                    type: "HR Policy Riddle",
+                    question: "An employee requests 12 weeks off to care for a newborn. Which federal law protects their job?",
+                    correct: "Family and Medical Leave Act (FMLA)",
+                    wrong: ["Americans with Disabilities Act (ADA)", "Fair Labor Standards Act (FLSA)", "Consolidated Omnibus Budget Reconciliation Act (COBRA)"],
+                    difficulty: 1
+                },
+                {
+                    type: "HR Policy Riddle",
+                    question: "Your company must pay overtime for hours worked over 40 per week. Which law mandates this?",
+                    correct: "Fair Labor Standards Act (FLSA)",
+                    wrong: ["Equal Pay Act", "Family and Medical Leave Act (FMLA)", "Occupational Safety and Health Act (OSHA)"],
+                    difficulty: 1
+                },
+                {
+                    type: "HR Policy Riddle",
+                    question: "Two employees doing identical work must receive equal pay regardless of gender. Which law?",
+                    correct: "Equal Pay Act of 1963",
+                    wrong: ["Title VII of the Civil Rights Act", "Fair Labor Standards Act", "Lilly Ledbetter Fair Pay Act"],
+                    difficulty: 1
+                },
+                {
+                    type: "HR Policy Riddle",
+                    question: "An employee with diabetes needs modified break times. Which law requires you to accommodate this?",
+                    correct: "Americans with Disabilities Act (ADA)",
+                    wrong: ["Rehabilitation Act", "Family and Medical Leave Act (FMLA)", "Health Insurance Portability and Accountability Act (HIPAA)"],
+                    difficulty: 2
+                },
+                {
+                    type: "HR Policy Riddle",
+                    question: "You're terminating health insurance for a former employee. They ask about continuing coverage. What law applies?",
+                    correct: "COBRA - Consolidated Omnibus Budget Reconciliation Act",
+                    wrong: ["HIPAA - Health Insurance Portability and Accountability Act", "ACA - Affordable Care Act", "ERISA - Employee Retirement Income Security Act"],
+                    difficulty: 3
+                }
+            ],
+
+            documentErrors: [
+                {
+                    type: "Find the Error",
+                    question: "What's wrong with this job posting?",
+                    context: "Seeking recent college graduate for entry-level position. Must be able to work nights and weekends. Looking for someone who can lift 50+ lbs regularly. Native English speakers preferred. Must pass background check and drug test before starting.",
+                    correct: "'Native English speakers preferred' is discriminatory",
+                    wrong: ["Weight requirement violates ADA", "Background checks are illegal", "Recent graduate requirement is discriminatory"],
+                    difficulty: 1
+                },
+                {
+                    type: "Find the Error",
+                    question: "Find the compliance violation in this employment offer letter:",
+                    context: "Dear Candidate, We're excited to offer you the position of Marketing Manager at $55,000 annually. You'll be classified as an exempt salaried employee and expected to work 50-60 hours per week as needed. Your start date is March 1st. Benefits include 5 days PTO in your first year. We look forward to having you on our team of young, energetic professionals!",
+                    correct: "Age discrimination - 'young, energetic professionals' violates ADEA",
+                    wrong: ["Salary is too low for exempt status", "PTO amount violates federal law", "Start date format is incorrect"],
+                    difficulty: 2
+                },
+                {
+                    type: "Find the Error",
+                    question: "Spot the problem in this termination notice:",
+                    context: "To: Sarah Johnson. Effective immediately, your employment is terminated due to performance issues. You have 48 hours to return company property. Your final paycheck will be mailed within 30 days. You are not eligible for unemployment benefits. Do not contact any current employees.",
+                    correct: "Final paycheck timing may violate state wage laws",
+                    wrong: ["Termination reason is too vague", "Property return deadline is illegal", "Cannot mention unemployment eligibility"],
+                    difficulty: 3
+                },
+                {
+                    type: "Find the Error",
+                    question: "Find the issue in this PTO policy:",
+                    context: "Employees accrue 1 day of PTO per month. PTO must be requested 30 days in advance. Unused PTO expires at year-end and cannot be carried over. PTO cannot be used during the first 90 days of employment. Employees who resign must give 30 days notice or forfeit all accrued PTO.",
+                    correct: "Forfeiture of accrued PTO may violate state wage laws",
+                    wrong: ["30-day advance request is illegal", "90-day waiting period violates FLSA", "Use-it-or-lose-it policies are federally prohibited"],
+                    difficulty: 3
+                },
+                {
+                    type: "Find the Error",
+                    question: "What's the compliance issue here?",
+                    context: "Company Policy: All employees must submit to random drug testing quarterly. Employees who test positive will be immediately terminated. Pregnant employees are exempt from testing. Medical marijuana users must disclose their status to HR. Testing results will be shared with department managers.",
+                    correct: "Sharing medical information with managers violates privacy laws",
+                    wrong: ["Quarterly testing is too frequent", "Pregnant employee exemption is discriminatory", "Medical marijuana disclosure requirement is illegal"],
+                    difficulty: 3
+                }
+            ],
+
+            crypticEmails: [
+                {
+                    type: "Decode the Email",
+                    question: "What does this manager need?",
+                    context: "Subject: Urgent - New Hire\n\nWe need to bring someone on ASAP. Skip the usual background stuff - I trust my judgment. They can start Monday. Just need them in the system by EOD. Handle the paperwork later.\n\nThanks!",
+                    correct: "This violates proper onboarding procedures - must decline",
+                    wrong: ["Fast-track the I-9 form only", "Process payroll without tax forms", "Accept the request and complete paperwork later"],
+                    difficulty: 1
+                },
+                {
+                    type: "Decode the Email",
+                    question: "What is your boss really asking for?",
+                    context: "Subject: Quick Question\n\nHey, can you send me those 'special documents' we discussed? You know, the ones about that 'situation' from last month with the employee who 'decided to pursue other opportunities.' Board meeting is tomorrow.\n\nThanks!",
+                    correct: "Termination documentation for an employment verification",
+                    wrong: ["Confidential salary information", "Medical records for insurance claims", "Performance reviews for all staff"],
+                    difficulty: 2
+                },
+                {
+                    type: "Decode the Email",
+                    question: "What's the real issue here?",
+                    context: "Subject: Team Dynamics\n\nI need to discuss some 'cultural fit' concerns about one of my team members. They're technically competent but just don't mesh with the team's vibe. Let's chat about transition options.\n\nConfidential please.",
+                    correct: "Potential discrimination disguised as 'cultural fit'",
+                    wrong: ["Legitimate performance management concern", "Request for team building activities", "Need for additional training resources"],
+                    difficulty: 2
+                },
+                {
+                    type: "Decode the Email",
+                    question: "What should you do?",
+                    context: "Subject: RE: Accommodation Request\n\nThis employee's accommodation requests are getting ridiculous. Can we just document everything so we have ammunition later? I think they're faking it honestly.\n\nLet me know.",
+                    correct: "Report potential ADA retaliation/discrimination",
+                    wrong: ["Agree to document everything", "Investigate if accommodation is legitimate", "Consult with employee's doctor directly"],
+                    difficulty: 3
+                },
+                {
+                    type: "Decode the Email",
+                    question: "What's being requested?",
+                    context: "Subject: Compensation Adjustment\n\nCan you make sure the new hire's offer matches what we discussed? Different title, same work as Sarah, but let's keep it at $60K since they're less experienced. Don't mention Sarah's salary ($80K) in the offer.\n\nThanks!",
+                    correct: "Potential Equal Pay Act violation - same work, different pay",
+                    wrong: ["Standard negotiation practice", "Legitimate pay equity based on experience", "Confidentiality requirement for salary info"],
+                    difficulty: 3
+                }
+            ],
+
+            complianceMatching: [
+                {
+                    type: "Match the Violation",
+                    question: "An employer refuses to hire anyone over 50 for a customer-facing role. What's violated?",
+                    correct: "Age Discrimination in Employment Act (ADEA)",
+                    wrong: ["Americans with Disabilities Act (ADA)", "Title VII of Civil Rights Act", "Equal Employment Opportunity Act"],
+                    difficulty: 1
+                },
+                {
+                    type: "Match the Violation",
+                    question: "An employee is fired three days after filing a workers' compensation claim. What's the primary concern?",
+                    correct: "Retaliation - illegal under workers' compensation laws",
+                    wrong: ["Wrongful termination - at-will employment was violated", "FMLA interference - medical leave wasn't granted", "ADA violation - disability discrimination occurred"],
+                    difficulty: 2
+                },
+                {
+                    type: "Match the Violation",
+                    question: "A manager asks female candidates about their childcare plans during interviews. What law does this violate?",
+                    correct: "Title VII - sex discrimination in hiring",
+                    wrong: ["FMLA - family leave interference", "Equal Pay Act - compensation discrimination", "Pregnancy Discrimination Act - specifically"],
+                    difficulty: 2
+                },
+                {
+                    type: "Match the Violation",
+                    question: "HR shares an employee's HIV status with their supervisor without consent. What's the issue?",
+                    correct: "ADA confidentiality requirements violated",
+                    wrong: ["HIPAA violation in the workplace", "FMLA privacy breach", "OSHA medical records violation"],
+                    difficulty: 3
+                },
+                {
+                    type: "Match the Violation",
+                    question: "A salaried employee earning $35,000/year is classified as exempt and works 55 hours weekly without overtime. What's wrong?",
+                    correct: "FLSA - salary too low for exempt status, owed overtime",
+                    wrong: ["Nothing - salaried employees don't get overtime", "Contract violation only, not legal issue", "State law issue only, not federal"],
+                    difficulty: 3
+                }
+            ],
+
+            spotTheFake: [
+                {
+                    type: "Spot the Fake",
+                    question: "Which statement about FMLA is FALSE?",
+                    correct: "FMLA requires paid leave for all qualifying events",
+                    wrong: ["FMLA provides up to 12 weeks of job-protected leave", "FMLA applies to employers with 50+ employees", "FMLA covers serious health conditions"],
+                    difficulty: 1
+                },
+                {
+                    type: "Spot the Fake",
+                    question: "Which of these is NOT a real HR policy requirement?",
+                    correct: "Employers must provide 2 weeks paid bereavement leave for all employees",
+                    wrong: ["Employers must display OSHA workplace safety posters", "Employers must keep I-9 forms for all employees", "Employers must provide reasonable break time for nursing mothers"],
+                    difficulty: 2
+                },
+                {
+                    type: "Spot the Fake",
+                    question: "Which is NOT a protected class under federal law?",
+                    correct: "Socioeconomic status",
+                    wrong: ["National origin", "Genetic information", "Pregnancy status"],
+                    difficulty: 2
+                },
+                {
+                    type: "Spot the Fake",
+                    question: "Which termination practice is actually LEGAL in most states?",
+                    correct: "Terminating employment without any reason (at-will)",
+                    wrong: ["Terminating someone for filing a wage complaint", "Terminating someone for discussing their salary", "Terminating someone for jury duty"],
+                    difficulty: 3
+                },
+                {
+                    type: "Spot the Fake",
+                    question: "Which is NOT a valid reason to reject an accommodation request under ADA?",
+                    correct: "The accommodation would cost more than $500",
+                    wrong: ["The accommodation would fundamentally alter the job", "The accommodation would create an undue hardship", "The employee cannot perform essential functions even with accommodation"],
+                    difficulty: 3
+                }
+            ]
+        };
+
+        // Initialize game
+        window.onload = function() {
+            updateBestScores();
+            checkUnlockedScenarios();
+        };
+
+        function updateBestScores() {
+            const auditBest = localStorage.getItem('escapeOffice_audit') || '--';
+            const bossBest = localStorage.getItem('escapeOffice_boss') || '--';
+            const complianceBest = localStorage.getItem('escapeOffice_compliance') || '--';
+            
+            document.getElementById('auditBest').textContent = auditBest !== '--' ? `🏆 ${auditBest}` : '🏆 --';
+            document.getElementById('bossBest').textContent = bossBest !== '--' ? `🏆 ${bossBest}` : '🏆 --';
+            document.getElementById('complianceBest').textContent = complianceBest !== '--' ? `🏆 ${complianceBest}` : '🏆 --';
+        }
+
+        function checkUnlockedScenarios() {
+            const auditComplete = localStorage.getItem('escapeOffice_audit_complete');
+            const bossComplete = localStorage.getItem('escapeOffice_boss_complete');
+            
+            // Clear any existing lock badges first
+            const existingBadges = document.querySelectorAll('.lock-badge');
+            existingBadges.forEach(badge => badge.remove());
+            
+            // Reset boss card
+            const bossCard = document.getElementById('bossCard');
+            bossCard.classList.remove('locked');
+            bossCard.onclick = () => selectScenario('boss');
+            
+            // Reset compliance card
+            const complianceCard = document.getElementById('complianceCard');
+            complianceCard.classList.remove('locked');
+            complianceCard.onclick = () => selectScenario('compliance');
+            
+            // Lock boss if audit not complete
+            if (!auditComplete) {
+                bossCard.classList.add('locked');
+                bossCard.onclick = null;
+                const lockBadge = document.createElement('div');
+                lockBadge.className = 'lock-badge';
+                lockBadge.textContent = '🔒 Complete Audit First';
+                bossCard.appendChild(lockBadge);
+            }
+            
+            // Lock compliance if boss not complete
+            if (!bossComplete) {
+                complianceCard.classList.add('locked');
+                complianceCard.onclick = null;
+                const lockBadge = document.createElement('div');
+                lockBadge.className = 'lock-badge';
+                lockBadge.textContent = '🔒 Complete Boss SOS First';
+                complianceCard.appendChild(lockBadge);
+            }
+        }
+
+        function selectScenario(scenario) {
+            currentScenario = scenario;
+            
+            const titles = {
+                'audit': '🚨 Audit Panic',
+                'boss': '⚡ Boss SOS',
+                'compliance': '🔒 Compliance Escape'
+            };
+            
+            document.getElementById('scenarioTitle').textContent = titles[scenario];
+            generatePuzzles();
+            startGame();
+        }
+
+        function generatePuzzles() {
+            console.log('Generating puzzles. Already used:', usedPuzzlesThisSession.length);
+            
+            // Combine all puzzle types
+            const allPuzzles = [
+                ...puzzleBank.policyRiddles,
+                ...puzzleBank.documentErrors,
+                ...puzzleBank.crypticEmails,
+                ...puzzleBank.complianceMatching,
+                ...puzzleBank.spotTheFake
+            ];
+
+            console.log('Total available puzzles:', allPuzzles.length);
+
+            // Filter out puzzles already used in this session
+            const availablePuzzles = allPuzzles.filter(p => {
+                const isUsed = usedPuzzlesThisSession.some(used => 
+                    used.question === p.question
+                );
+                return !isUsed;
+            });
+
+            console.log('Remaining unused puzzles:', availablePuzzles.length);
+
+            // If we've used too many puzzles, reset the session
+            if (availablePuzzles.length < 5) {
+                console.log('Resetting puzzle pool - running out of puzzles');
+                usedPuzzlesThisSession = [];
+                return generatePuzzles();
+            }
+
+            // Shuffle available puzzles
+            const shuffled = availablePuzzles.sort(() => Math.random() - 0.5);
+
+            // Separate by difficulty
+            const easy = shuffled.filter(p => p.difficulty === 1);
+            const medium = shuffled.filter(p => p.difficulty === 2);
+            const hard = shuffled.filter(p => p.difficulty === 3);
+
+            // Select unique puzzles with varying difficulty
+            scenarioPuzzles = [];
+
+            // Pick 1 easy (or best available)
+            if (easy.length > 0) {
+                scenarioPuzzles.push(easy[0]);
+            } else if (shuffled.length > 0) {
+                scenarioPuzzles.push(shuffled[0]);
+            }
+
+            // Pick 2 medium (or best available)
+            let mediumCount = 0;
+            for (let i = 0; i < medium.length && mediumCount < 2; i++) {
+                if (!scenarioPuzzles.includes(medium[i])) {
+                    scenarioPuzzles.push(medium[i]);
+                    mediumCount++;
+                }
+            }
+
+            // Fill remaining with any difficulty if needed
+            while (scenarioPuzzles.length < 3 && shuffled.length > scenarioPuzzles.length) {
+                for (let puzzle of shuffled) {
+                    if (!scenarioPuzzles.includes(puzzle) && scenarioPuzzles.length < 3) {
+                        scenarioPuzzles.push(puzzle);
+                    }
+                }
+            }
+
+            // Pick 2 hard (or best available)
+            let hardCount = 0;
+            for (let i = 0; i < hard.length && hardCount < 2; i++) {
+                if (!scenarioPuzzles.includes(hard[i])) {
+                    scenarioPuzzles.push(hard[i]);
+                    hardCount++;
+                }
+            }
+
+            // Fill remaining slots if needed
+            while (scenarioPuzzles.length < 5 && shuffled.length > scenarioPuzzles.length) {
+                for (let puzzle of shuffled) {
+                    if (!scenarioPuzzles.includes(puzzle) && scenarioPuzzles.length < 5) {
+                        scenarioPuzzles.push(puzzle);
+                    }
+                }
+            }
+
+            // Add these puzzles to the used list
+            usedPuzzlesThisSession.push(...scenarioPuzzles);
+            console.log('Selected', scenarioPuzzles.length, 'puzzles. Total used now:', usedPuzzlesThisSession.length);
+
+            // Final shuffle for variety
+            scenarioPuzzles = scenarioPuzzles.sort(() => Math.random() - 0.5);
+        }
+
+        function startGame() {
+            score = 0;
+            timeLeft = 300;
+            currentPuzzleIndex = 0;
+            correctAnswers = 0;
+            totalAttempts = 0;
+
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+
+            updateDisplay();
+            loadPuzzle();
+            startTimer();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+
+                if (timeLeft <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer').textContent = display;
+
+            const timerElement = document.getElementById('timer');
+            if (timeLeft <= 60) {
+                timerElement.classList.add('danger');
+            } else if (timeLeft <= 120) {
+                timerElement.classList.add('warning');
+            }
+        }
+
+        function loadPuzzle() {
+            if (currentPuzzleIndex >= scenarioPuzzles.length) {
+                endGame(true);
+                return;
+            }
+
+            currentPuzzle = scenarioPuzzles[currentPuzzleIndex];
+
+            document.getElementById('puzzleType').textContent = currentPuzzle.type;
+            document.getElementById('puzzleQuestion').textContent = currentPuzzle.question;
+
+            // Show context if exists
+            const contextDiv = document.getElementById('puzzleContext');
+            if (currentPuzzle.context) {
+                contextDiv.textContent = currentPuzzle.context;
+                contextDiv.classList.remove('hidden');
+            } else {
+                contextDiv.classList.add('hidden');
+            }
+
+            // Create options
+            let options = [currentPuzzle.correct, ...currentPuzzle.wrong];
+            options = options.sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('feedback').classList.add('hidden');
+            updateDisplay();
+        }
+
+        function checkAnswer(selected, btn) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(b => b.disabled = true);
+
+            totalAttempts++;
+            const feedback = document.getElementById('feedback');
+
+            if (selected === currentPuzzle.correct) {
+                correctAnswers++;
+                score += 100;
+                btn.classList.add('correct');
+                feedback.textContent = '✓ Correct! Moving to next puzzle...';
+                feedback.className = 'feedback correct';
+
+                setTimeout(() => {
+                    currentPuzzleIndex++;
+                    loadPuzzle();
+                }, 2000);
+            } else {
+                timeLeft = Math.max(0, timeLeft - 30); // Penalty: lose 30 seconds
+                btn.classList.add('incorrect');
+                
+                // Show correct answer
+                allButtons.forEach(b => {
+                    if (b.textContent === currentPuzzle.correct) {
+                        b.classList.add('correct');
+                    }
+                });
+
+                feedback.textContent = '✗ Wrong! -30 seconds penalty. Moving on...';
+                feedback.className = 'feedback incorrect';
+
+                setTimeout(() => {
+                    currentPuzzleIndex++;
+                    loadPuzzle();
+                }, 3000);
+            }
+
+            feedback.classList.remove('hidden');
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('progress').textContent = `${correctAnswers}/5`;
+            document.getElementById('score').textContent = score;
+        }
+
+        function quitGame() {
+            if (confirm('Are you sure you want to quit? Your progress will be lost.')) {
+                clearInterval(timer);
+                showWelcome();
+            }
+        }
+
+        function endGame(escaped) {
+            clearInterval(timer);
+
+            // Calculate stats
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            const accuracy = totalAttempts > 0 ? Math.round((correctAnswers / totalAttempts) * 100) : 0;
+
+            // Bonus for time remaining
+            if (escaped) {
+                score += timeLeft * 2; // 2 points per second remaining
+            }
+
+            // Update UI
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+
+            const statusElement = document.getElementById('escapeStatus');
+            if (escaped && correctAnswers === 5) {
+                statusElement.textContent = '🎉 YOU ESCAPED!';
+                statusElement.className = 'escape-status success';
+                
+                // Mark scenario as complete - ONLY if all 5 puzzles solved correctly
+                localStorage.setItem(`escapeOffice_${currentScenario}_complete`, 'true');
+                console.log(`Scenario ${currentScenario} marked complete!`); // Debug log
+            } else if (escaped) {
+                statusElement.textContent = '⚠️ ESCAPED - But not perfectly!';
+                statusElement.className = 'escape-status success';
+            } else {
+                statusElement.textContent = '⏰ TIME\'S UP!';
+                statusElement.className = 'escape-status failed';
+            }
+
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('timeRemaining').textContent = timeDisplay;
+            document.getElementById('puzzlesSolved').textContent = `${correctAnswers}/5`;
+            document.getElementById('accuracy').textContent = `${accuracy}%`;
+
+            // Update best score
+            const storageKey = `escapeOffice_${currentScenario}`;
+            const currentBest = parseInt(localStorage.getItem(storageKey)) || 0;
+            
+            if (score > currentBest) {
+                localStorage.setItem(storageKey, score);
+                document.getElementById('bestScore').textContent = `${score} 🎉 NEW RECORD!`;
+            } else {
+                document.getElementById('bestScore').textContent = currentBest;
+            }
+        }
+
+        function showWelcome() {
+            document.getElementById('gameScreen').classList.add('hidden');
+            document.getElementById('endScreen').classList.add('hidden');
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            updateBestScores();
+            checkUnlockedScenarios();
+        }
+
+        function retryScenario() {
+            generatePuzzles();
+            startGame();
+        }
+    </script>
+</body>
+</html>
